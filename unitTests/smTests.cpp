@@ -18,6 +18,7 @@ enum TEST_EVENTS{
 static void testTopState(SM_TS* const testSm);
 static void testErrorState(SM_TS* const testSm);
 static void testMotorRunState(SM_TS* const testSm);
+static void testMotorStopState(SM_TS* const testSm);
 
 TEST_GROUP(sm)
 {
@@ -33,21 +34,13 @@ TEST_GROUP(sm)
 
 TEST(sm, smFirstTest)
 {
-    smRun(&testSm);
+    smStart(&testSm);
     smSetEvent(&testSm, EVT_MOTOR_RUN);
-    smRun(&testSm);
-    smSetEvent(&testSm, EVT_ERROR);
-    smRun(&testSm);
-    smRun(&testSm);
-    smRun(&testSm);
-    smSetEvent(&testSm, EVT_ESCAPE_ERROR);
-    smRun(&testSm);
-    smRun(&testSm);
-    smRun(&testSm);
-    smRun(&testSm);
-    smRun(&testSm);
-    smRun(&testSm);
-    smRun(&testSm);
+
+    for(int i = 0; i < 52; i++ )
+    {
+        smRun(&testSm);
+    }
 }
 
 static void testTopState(SM_TS* const testSm)
@@ -55,14 +48,14 @@ static void testTopState(SM_TS* const testSm)
     switch (testSm->event)
     {
     case EVT_ENTRY:
-        //printf("Top State => Entry Event\n");
+        printf("Top State => Entry Event\n");
         break;
     case EVT_EXIT:
-        //printf("Top State => Exit Event\n");
+        printf("Top State => Exit Event\n");
         break;
     case EVT_MOTOR_RUN:
         smTransition(testSm, testMotorRunState);
-        //printf("Top State => MotorRun Event\n");
+        printf("Top State => MotorRun Event\n");
         break;
     }
 
@@ -74,19 +67,47 @@ static void testMotorRunState(SM_TS* const testSm)
     switch (testSm->event)
     {
     case EVT_ENTRY:
-        //printf("MotorRun State => Entry Event\n");
+        smSetEvent(testSm, EVT_TIMEOUT);
+        printf("MotorRun State => Entry Event\n");
         break;
     case EVT_EXIT:
-        //printf("MotorRun State => Exit Event\n");
+        printf("MotorRun State => Exit Event\n");
+        break;
+    case EVT_ERROR:
+        smTransition(testSm, testMotorRunState);
+        printf("MotorRun State => Error Event\n");
+        break;
+    case EVT_TIMEOUT:
+        smTransition(testSm, testMotorStopState);
+        printf("MotorRun State => Timeout Event\n");
+        break;
+    }
+
+    return;
+}
+
+static void testMotorStopState(SM_TS* const testSm)
+{
+    switch (testSm->event)
+    {
+    case EVT_ENTRY:
+        smSetEvent(testSm, EVT_TIMEOUT);
+        printf("MotorStop State => Entry Event\n");
+        break;
+    case EVT_EXIT:
+        printf("MotorStop State => Exit Event\n");
         break;
     case EVT_ERROR:
         smTransition(testSm, testErrorState);
-        //printf("MotorRun State => Error Event\n");
+        printf("MotorStop State => Error Event\n");
         break;
     case EVT_TIMEOUT:
-        //printf("MotorRun State => Timeout Event\n");
+        smTransition(testSm, testMotorRunState);
+        printf("MotorStop State => Timeout Event\n");
         break;
     }
+
+    return;
 }
 
 static void testErrorState(SM_TS* const testSm)
@@ -94,16 +115,19 @@ static void testErrorState(SM_TS* const testSm)
     switch (testSm->event)
     {
     case EVT_ENTRY:
-        //printf("Error State => Entry Event\n");
+        printf("Error State => Entry Event\n");
         break;
     case EVT_EXIT:
-        //printf("Error State => Exit Event\n");
+        printf("Error State => Exit Event\n");
         break;
 
     case EVT_ESCAPE_ERROR:
         smTransition(testSm, testMotorRunState);
-        //printf("Error State => Escape Error Event\n");
+        printf("Error State => Escape Error Event\n");
         break;
     }
+
     return;
 }
+
+

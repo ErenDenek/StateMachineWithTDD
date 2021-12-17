@@ -1,10 +1,5 @@
 #include "sm.h"
 
-#define CURR_STATE  ( self->state )
-#define TAR_STATE   ( self->targetState )
-#define CURR_EVENT  ( self->event )
-#define TAR_EVENT   ( self->targetEvent )
-
 void smInit( SM_TS *const self, state_func_t topState )
 {
     CURR_STATE = topState;
@@ -16,9 +11,17 @@ void smInit( SM_TS *const self, state_func_t topState )
     TAR_EVENT = EVT_NONE;
 }
 
+void smStart( SM_TS *const self )
+{
+    if( CURR_STATE != NULL )
+    {
+       CURR_STATE(self);
+    }
+}
+
 void smRun( SM_TS *const self )
 {
-    static event_t lastEvent;
+    static event_t lastEvent = EVT_ENTRY;
 
     if( CURR_EVENT != lastEvent ) //If there is a change on state of event.
     {

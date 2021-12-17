@@ -14,6 +14,11 @@
 #define EVT_EXIT    ( -2 )
 #define EVT_NONE    ( -3 )
 
+#define CURR_STATE  ( self->state )
+#define TAR_STATE   ( self->targetState )
+#define CURR_EVENT  ( self->event )
+#define TAR_EVENT   ( self->targetEvent )
+
 typedef struct SM_TS SM_TS;
 typedef void (*state_func_t)(SM_TS *const self);
 typedef int32_t event_t;
@@ -35,6 +40,8 @@ void smInit( SM_TS *const self, state_func_t targetState );
 void smSetEvent( SM_TS *const self, event_t event );
 
 void smTransition( SM_TS *const self, state_func_t targetState );
+
+void smStart( SM_TS *const self );
 
 void smRun( SM_TS *const self );
 
