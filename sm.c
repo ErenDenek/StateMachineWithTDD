@@ -3,6 +3,7 @@
 #define CURR_STATE  ( self->state )
 #define TAR_STATE   ( self->targetState )
 #define CURR_EVENT  ( self->event )
+#define TAR_EVENT   ( self->targetEvent )
 
 void smInit( SM_TS *const self, state_func_t topState )
 {
@@ -11,6 +12,8 @@ void smInit( SM_TS *const self, state_func_t topState )
     TAR_STATE = CURR_STATE;
 
     CURR_EVENT = EVT_ENTRY; //First event must be entry event each state.
+
+    TAR_EVENT = EVT_NONE;
 }
 
 void smRun( SM_TS *const self )
@@ -23,7 +26,7 @@ void smRun( SM_TS *const self )
         CURR_STATE(self); //Run state( related function ) one times.
     }
 
-    if( CURR_STATE != TAR_STATE )
+    if( CURR_STATE != TAR_STATE ) //While exiting from state, exit event is processed If there is a transition among any state. After, current event is setted as entry event for target state.
     {
         static uint8_t sta = 0;
 
@@ -36,6 +39,10 @@ void smRun( SM_TS *const self )
             sta = 0;
         }
     }
+    else //Target event can process If there is no a transition among any states.
+    {
+        CURR_EVENT = TAR_EVENT;
+    }
 }
 
 void smTransition( SM_TS *const self, state_func_t targetState )
@@ -45,7 +52,7 @@ void smTransition( SM_TS *const self, state_func_t targetState )
 
 void smSetEvent( SM_TS *const self, event_t event )
 {
-    CURR_EVENT = event;
+    TAR_EVENT = event;
 }
 
 

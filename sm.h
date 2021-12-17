@@ -12,6 +12,7 @@
 /* DEFINITIONS */
 #define EVT_ENTRY   ( -1 )
 #define EVT_EXIT    ( -2 )
+#define EVT_NONE    ( -3 )
 
 typedef struct SM_TS SM_TS;
 typedef void (*state_func_t)(SM_TS *const self);
@@ -24,6 +25,8 @@ struct SM_TS{
     state_func_t targetState;
 
     event_t event;
+
+    event_t targetEvent;
 };
 
 /* FUNCTIONS */

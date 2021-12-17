@@ -40,6 +40,13 @@ TEST(sm, smFirstTest)
     smRun(&testSm);
     smRun(&testSm);
     smRun(&testSm);
+    smSetEvent(&testSm, EVT_ESCAPE_ERROR);
+    smRun(&testSm);
+    smRun(&testSm);
+    smRun(&testSm);
+    smRun(&testSm);
+    smRun(&testSm);
+    smRun(&testSm);
     smRun(&testSm);
 }
 
@@ -48,14 +55,14 @@ static void testTopState(SM_TS* const testSm)
     switch (testSm->event)
     {
     case EVT_ENTRY:
-        printf("Top State => Entry Event\n");
+        //printf("Top State => Entry Event\n");
         break;
     case EVT_EXIT:
-        printf("Top State => Exit Event\n");
+        //printf("Top State => Exit Event\n");
         break;
     case EVT_MOTOR_RUN:
         smTransition(testSm, testMotorRunState);
-        printf("Top State => MotorRun Event\n");
+        //printf("Top State => MotorRun Event\n");
         break;
     }
 
@@ -67,34 +74,35 @@ static void testMotorRunState(SM_TS* const testSm)
     switch (testSm->event)
     {
     case EVT_ENTRY:
-        printf("MotorRun State => Entry Event\n");
+        //printf("MotorRun State => Entry Event\n");
         break;
     case EVT_EXIT:
-        printf("MotorRun State => Exit Event\n");
+        //printf("MotorRun State => Exit Event\n");
         break;
     case EVT_ERROR:
         smTransition(testSm, testErrorState);
-        printf("MotorRun State => Error Event\n");
+        //printf("MotorRun State => Error Event\n");
         break;
     case EVT_TIMEOUT:
-        printf("MotorRun State => Timeout Event\n");
+        //printf("MotorRun State => Timeout Event\n");
         break;
     }
 }
+
 static void testErrorState(SM_TS* const testSm)
 {
     switch (testSm->event)
     {
     case EVT_ENTRY:
-        printf("Error State => Entry Event\n");
+        //printf("Error State => Entry Event\n");
         break;
     case EVT_EXIT:
-        printf("Error State => Exit Event\n");
+        //printf("Error State => Exit Event\n");
         break;
 
     case EVT_ESCAPE_ERROR:
         smTransition(testSm, testMotorRunState);
-        printf("Error State => Escape Error Event\n");
+        //printf("Error State => Escape Error Event\n");
         break;
     }
     return;
