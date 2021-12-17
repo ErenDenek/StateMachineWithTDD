@@ -14,10 +14,12 @@
 #define EVT_EXIT    ( -2 )
 #define EVT_NONE    ( -3 )
 
-#define CURR_STATE  ( self->state )
-#define TAR_STATE   ( self->targetState )
-#define CURR_EVENT  ( self->event )
-#define TAR_EVENT   ( self->targetEvent )
+#define SM_INIT(__sm__, __topState__)           smInit(&__sm__, &__topState__)
+#define SM_START(__sm__)                        smStart(&__sm__)
+#define SM_RUN(__sm__)                          smRun(&__sm__)
+#define SM_HANDLER(__state__)                   void __state__(SM_TS* const _sm)
+#define SM_TRANS(__targetState__)               smTransition(_sm, __targetState__)
+#define SM_SET_EVENT(__sm__, __targetEvent__)   smSetEvent(__sm__, __targetEvent__)
 
 typedef struct SM_TS SM_TS;
 typedef void (*state_func_t)(SM_TS *const self);
@@ -35,7 +37,7 @@ struct SM_TS{
 };
 
 /* FUNCTIONS */
-void smInit( SM_TS *const self, state_func_t targetState );
+void smInit( SM_TS *const self, state_func_t topState );
 
 void smSetEvent( SM_TS *const self, event_t event );
 
