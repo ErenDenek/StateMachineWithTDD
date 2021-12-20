@@ -2,11 +2,9 @@
 #define SM_H
 
 #include <stdint.h>
+
 /*
     todo:
-    - State içinde entry, exit eventlerini çalışsın.
-    - State eventleri kontrol etsin
-    - State transition fonksiyonu olsun.
 */
 
 /* DEFINITIONS */
