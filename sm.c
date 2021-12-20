@@ -13,7 +13,7 @@
  *                  : topState => This parameter determines top state.
  * @returns         : void
 */
-void smInit( SM_TS *const self, state_func_t topState )
+void smInit(SM_TS *const self, const state_func_t topState )
 {
     CURR_STATE = topState;
 
@@ -83,7 +83,7 @@ void smRun( SM_TS *const self )
  *                  : targetState => Transition isn't successful If target state isn't state handler
  * @returns         : void
 */
-void smTransition( SM_TS *const self, state_func_t targetState )
+void smTransition(SM_TS *const self, const state_func_t targetState )
 {
     if( targetState != NULL )
     {
@@ -97,9 +97,12 @@ void smTransition( SM_TS *const self, state_func_t targetState )
  *                  : event =>  event parameter set event of state.
  * @returns         : void
 */
-void smSetEvent( SM_TS *const self, event_t event )
+void smSetEvent(SM_TS *const self, const event_t event )
 {
-    TAR_EVENT = event;
+    if( event >= EVENT_GREATER_ZERO ) //event parameter have to be greater zero. Becaause negative values are reserved for this library.
+    {
+        TAR_EVENT = event;
+    }
 }
 
 

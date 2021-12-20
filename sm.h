@@ -2,9 +2,11 @@
 #define SM_H
 
 #include <stdint.h>
-
 /*
     todo:
+    - Takip edilebilirlik için hangi state ve event üzerinde olduğu kaydedebiliriz.
+    - Debug için sm history fonksiyonları yazılabilir.
+    - Ctor fonksiyonu eklenebilir.
 */
 
 /* DEFINITIONS */
@@ -20,6 +22,8 @@
 #define SM_TRANS(__targetState__)               smTransition(_sm, __targetState__)
 #define SM_SET_EVENT(__sm__, __targetEvent__)   smSetEvent(__sm__, __targetEvent__)
 
+#define EVENT_GREATER_ZERO  (0)
+/* TYPES */
 typedef struct SM_TS SM_TS;
 typedef void (*state_func_t)(SM_TS *const self);
 typedef int32_t event_t;
@@ -36,11 +40,11 @@ struct SM_TS{
 };
 
 /* FUNCTIONS */
-void smInit( SM_TS *const self, state_func_t topState );
+void smInit( SM_TS *const self, const state_func_t topState );
 
-void smSetEvent( SM_TS *const self, event_t event );
+void smSetEvent( SM_TS *const self, const event_t event );
 
-void smTransition( SM_TS *const self, state_func_t targetState );
+void smTransition( SM_TS *const self, const state_func_t targetState );
 
 void smStart( SM_TS *const self );
 
