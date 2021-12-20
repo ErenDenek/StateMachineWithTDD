@@ -48,7 +48,7 @@ void smRun( SM_TS *const self )
 {
     static event_t lastEvent = EVT_ENTRY;
 
-    if( CURR_EVENT != lastEvent ) //If there is a change on state of event.
+    if( CURR_EVENT != lastEvent || CURR_EVENT == EVT_LOOP ) //If there is a change on state of event.
     {
         lastEvent = CURR_EVENT; //lastEvent must be current event.
 

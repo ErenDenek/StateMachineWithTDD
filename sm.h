@@ -13,6 +13,7 @@
 #define EVT_ENTRY   ( -1 )
 #define EVT_EXIT    ( -2 )
 #define EVT_NONE    ( -3 )
+#define EVT_LOOP    ( -4 )
 
 #define SM_INIT(__sm__, __topState__)           smInit(&__sm__, &__topState__)
 #define SM_START(__sm__)                        smStart(&__sm__)

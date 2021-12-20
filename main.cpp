@@ -20,7 +20,7 @@ enum TEST_EVENTS{
     EVT_ESCAPE_ERROR
 };
 
-/* Functions protypes */
+/* State Handler prototypes */
 SM_HANDLER(topState);
 SM_HANDLER(ErrorState);
 SM_HANDLER(MotorRunState);
@@ -92,7 +92,6 @@ SM_HANDLER(ErrorState)
     case EVT_EXIT:
         printf("Error State => Exit Event\n");
         break;
-
     case EVT_ESCAPE_ERROR:
         SM_TRANS(MotorStopState);
         printf("Error State => Escape Error Event\n");
@@ -108,9 +107,13 @@ SM_HANDLER(MotorRunState)
     {
     case EVT_ENTRY:
         printf("MotorRun State => Entry Event\n");
+        SM_SET_EVENT(_sm, EVT_LOOP);
         break;
     case EVT_EXIT:
         printf("MotorRun State => Exit Event\n");
+        break;
+    case EVT_LOOP:
+        printf("MotorRunState State => Loop Event\n");
         break;
     case EVT_ERROR:
         SM_TRANS(ErrorState);
@@ -131,9 +134,13 @@ SM_HANDLER(MotorStopState)
     {
     case EVT_ENTRY:
         printf("MotorStop State => Entry Event\n");
+        SM_SET_EVENT(_sm, EVT_LOOP);
         break;
     case EVT_EXIT:
         printf("MotorStop State => Exit Event\n");
+        break;
+    case EVT_LOOP:
+        printf("MotorStop State => Loop Event\n");
         break;
     case EVT_ERROR:
         SM_TRANS(ErrorState);
