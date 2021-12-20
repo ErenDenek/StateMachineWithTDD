@@ -99,10 +99,7 @@ void smTransition(SM_TS *const self, const state_func_t targetState )
 */
 void smSetEvent(SM_TS *const self, const event_t event )
 {
-    if( event >= EVENT_GREATER_ZERO ) //event parameter have to be greater zero. Becaause negative values are reserved for this library.
-    {
         TAR_EVENT = event;
-    }
 }
 
 
