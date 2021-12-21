@@ -1,11 +1,13 @@
-#include "sm.h"
+#include "hsm.h"
+#include "stdbool.h"
 
-#define CURR_STATE  ( self->state )
+#define SIZE_STATE  ( self->stateSize )
+#define CURR_STATE  ( self->stateCurrent )
 #define TAR_STATE   ( self->targetState )
 #define CURR_EVENT  ( self->event )
 #define TAR_EVENT   ( self->targetEvent )
 
-//_Bool loopEventTriggered = true;
+static bool eventLoopTriggered = false;
 
 /* @function name   : smInit
  * @brief           : It sets the top state with topState parameter.
@@ -15,9 +17,11 @@
  *                  : topState => This parameter determines top state.
  * @returns         : void
 */
-void smInit(SM_TS *const self, const state_func_t topState )
+void hsmInit( HSM_TS *const self, const state_func_t* stateTable, const uint32_t stateSize )
 {
-    CURR_STATE = topState;
+    SIZE_STATE = stateSize;
+
+    CURR_STATE = stateTable[0][1];
 
     TAR_STATE = CURR_STATE;
 
@@ -31,7 +35,7 @@ void smInit(SM_TS *const self, const state_func_t topState )
  * @params          : self => Reference of sm object.
  * @returns         : void
 */
-void smStart( SM_TS *const self )
+void hsmStart( HSM_TS *const self )
 {
     if( CURR_STATE != NULL ) //Won't begin the handler If it doesn't set for any state handler.
     {
@@ -46,11 +50,11 @@ void smStart( SM_TS *const self )
  * @params          : self => Reference of sm object.
  * @returns         : void
 */
-void smRun( SM_TS *const self )
+void hsmRun( HSM_TS *const self )
 {
     static event_t lastEvent = EVT_ENTRY;
 
-    if( CURR_EVENT != lastEvent ) //If there is a change on state of event.
+    if( CURR_EVENT != lastEvent || eventLoopTriggered == true ) //If there is a change on state of event.
     {
         lastEvent = CURR_EVENT; //lastEvent must be current event.
 
@@ -77,6 +81,7 @@ void smRun( SM_TS *const self )
     {
         CURR_EVENT = TAR_EVENT;
     }
+
 }
 
 /* @function name   : smTransition
@@ -85,11 +90,13 @@ void smRun( SM_TS *const self )
  *                  : targetState => Transition isn't successful If target state isn't state handler
  * @returns         : void
 */
-void smTransition(SM_TS *const self, const state_func_t targetState )
+void hsmTransition( HSM_TS *const self, const state_func_t targetState )
 {
     if( targetState != NULL )
     {
         TAR_STATE = targetState;
+
+        eventLoopTriggered = false;
     }
 }
 
@@ -99,14 +106,17 @@ void smTransition(SM_TS *const self, const state_func_t targetState )
  *                  : event =>  event parameter set event of state.
  * @returns         : void
 */
-void smSetEvent(SM_TS *const self, const event_t event )
+void hsmSetEvent( HSM_TS *const self, const event_t event )
 {
+    eventLoopTriggered = false;
+
     TAR_EVENT = event;
 }
 
-void smSetEventLoop( SM_TS* const self, const event_evet )
+void hsmSetEventLoop( HSM_TS* const self, const event_t event )
 {
+    eventLoopTriggered = true;
 
+    TAR_EVENT = event;
 }
-
 

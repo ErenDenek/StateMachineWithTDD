@@ -5,76 +5,67 @@ extern "C"
 #include <stdio.h>
 #include <stdint.h>
 #include <stdbool.h>
-#include "sm.h"
+#include "hsm/hsm.h"
 }
 
 #if RELEASE == 1
 
-SM_TS motorControlSm;
+HSM_TS motorControlSm;
 
 /* Event of states. It is optionally. */
 enum TEST_EVENTS{
     EVT_MOTOR_RUN,
     EVT_ERROR,
     EVT_TIMEOUT,
-    EVT_ESCAPE_ERROR
+    EVT_ESCAPE_ERROR,
+    EVT_LOOP
 };
 
 /* State Handler prototypes */
-SM_HANDLER(topState);
-SM_HANDLER(ErrorState);
-SM_HANDLER(MotorRunState);
-SM_HANDLER(MotorStopState);
+HSM_HANDLER(stop);
+HSM_HANDLER(s1);
+HSM_HANDLER(s2);
+HSM_HANDLER(s3);
+
+static const state_func_t states[][2] =
+{
+    STATE_CTOR(stop, s1)
+    STATE_CTOR(s1, s2)
+    STATE_CTOR(s2, s3)
+};
 
 int main()
 {
+    //HSM_INIT(motorControlSm, states[0][0], sizeof(states)/sizeof(states[0]));
+    hsmInit(&motorControlSm, &states[0][0], sizeof(states)/sizeof(states[0]) );
+    HSM_START(motorControlSm);
 
-    /* State-machine is initialized */
-    SM_INIT(motorControlSm, topState);
-
-    /* State-machine is started */
-    SM_START(motorControlSm);
-
-    for(int i = 0; i < 1000; i++)
+    for(int i = 0; i < 100; i++ )
     {
-        SM_RUN(motorControlSm);
+        HSM_RUN(motorControlSm);
 
-        if( i % 10 == 0 ) // Assume that it is triggered in 10 ms.
+        printf("%d. ", i);
+        if( i == 20 )
         {
-            SM_SET_EVENT( &motorControlSm, EVT_TIMEOUT);
-        }
-
-    }
-
-
-    for( int i = 0; i < 1000; i++ )
-    {
-        SM_RUN(motorControlSm);
-
-        if( i == 100 ){
-            SM_SET_EVENT( &motorControlSm, EVT_ERROR );
-        }
-        else if( i == 950 ){
-            SM_SET_EVENT( &motorControlSm, EVT_ESCAPE_ERROR );
+            HSM_SET_EVENT( &motorControlSm, EVT_ERROR );
         }
     }
 
     return 0;
 }
 
-SM_HANDLER(topState)
+HSM_HANDLER(stop)
 {
-    switch (_sm->event)
+    switch (_hsm->event)
     {
     case EVT_ENTRY:
-        SM_SET_EVENT(_sm, EVT_MOTOR_RUN);
+        HSM_SET_EVENT(_hsm, EVT_MOTOR_RUN);
         printf("Top State => Entry Event\n");
         break;
     case EVT_EXIT:
         printf("Top State => Exit Event\n");
         break;
     case EVT_MOTOR_RUN:
-        SM_TRANS(MotorRunState);
         printf("Top State => MotorRun Event\n");
         break;
     }
@@ -82,9 +73,9 @@ SM_HANDLER(topState)
     return;
 }
 
-SM_HANDLER(ErrorState)
+HSM_HANDLER(s1)
 {
-    switch (_sm->event)
+    switch (_hsm->event)
     {
     case EVT_ENTRY:
         printf("Error State => Entry Event\n");
@@ -93,7 +84,6 @@ SM_HANDLER(ErrorState)
         printf("Error State => Exit Event\n");
         break;
     case EVT_ESCAPE_ERROR:
-        SM_TRANS(MotorStopState);
         printf("Error State => Escape Error Event\n");
         break;
     }
@@ -101,26 +91,24 @@ SM_HANDLER(ErrorState)
     return;
 }
 
-SM_HANDLER(MotorRunState)
+HSM_HANDLER(s2)
 {
-    switch (_sm->event)
+    switch (_hsm->event)
     {
     case EVT_ENTRY:
+        HSM_SET_EVENT_LOOP(_hsm, EVT_LOOP);
         printf("MotorRun State => Entry Event\n");
-        SM_SET_EVENT(_sm, EVT_LOOP);
         break;
     case EVT_EXIT:
         printf("MotorRun State => Exit Event\n");
         break;
     case EVT_LOOP:
-        printf("MotorRunState State => Loop Event\n");
+        printf("MotorRun State => Loop Event\n");
         break;
     case EVT_ERROR:
-        SM_TRANS(ErrorState);
         printf("MotorRun State => Error Event\n");
         break;
     case EVT_TIMEOUT:
-        SM_TRANS(MotorStopState);
         printf("MotorRun State => Timeout Event\n");
         break;
     }
@@ -128,26 +116,20 @@ SM_HANDLER(MotorRunState)
     return;
 }
 
-SM_HANDLER(MotorStopState)
+HSM_HANDLER(s3)
 {
-    switch (_sm->event)
+    switch (_hsm->event)
     {
     case EVT_ENTRY:
         printf("MotorStop State => Entry Event\n");
-        SM_SET_EVENT(_sm, EVT_LOOP);
         break;
     case EVT_EXIT:
         printf("MotorStop State => Exit Event\n");
         break;
-    case EVT_LOOP:
-        printf("MotorStop State => Loop Event\n");
-        break;
     case EVT_ERROR:
-        SM_TRANS(ErrorState);
         printf("MotorStop State => Error Event\n");
         break;
     case EVT_TIMEOUT:
-        SM_TRANS(MotorRunState);
         printf("MotorStop State => Timeout Event\n");
         break;
     }
